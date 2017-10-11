@@ -24,10 +24,9 @@ end
 numIter = iterations;
 % showProg = true;
 % showResult = true;
-% showWaitbar = false;
 
 % Create userconfig struct
-config = userConfig(xy,dmat,popSize,numIter,true,true,false);
+config = struct('xy',xy,'dmat',dmat,'popSize',popSize,'numIter',numIter,'showProg',true,'showResult',true);
 tsp_ga(config);
 
 end
