@@ -95,6 +95,7 @@ function varargout = tsp_ga(varargin)
     defaultConfig.dmat        = [];
     defaultConfig.popSize     = 100;
     defaultConfig.numIter     = 1e4;
+    defaultConfig.mutation    = 'inversion';
     defaultConfig.showProg    = true;
     defaultConfig.showResult  = true;
     
@@ -119,6 +120,7 @@ function varargout = tsp_ga(varargin)
     dmat        = configStruct.dmat;
     popSize     = configStruct.popSize;
     numIter     = configStruct.numIter;
+    mutation    = configStruct.mutation;
     showProg    = configStruct.showProg;
     showResult  = configStruct.showResult;
     if isempty(dmat)
@@ -134,6 +136,10 @@ function varargout = tsp_ga(varargin)
         error('Invalid XY or DMAT inputs!')
     end
     n = N;
+    mutation = lower(mutation);
+    if (mutation ~= "inversion") && (mutation ~= "swap") && (mutation ~= "slide")
+        error('Invalid mutation type chosen');
+    end
     
     % Sanity Checks
     popSize     = 4*ceil(popSize/4);
@@ -187,27 +193,29 @@ function varargout = tsp_ga(varargin)
         
         % Genetic Algorithm Operators
         randomOrder = randperm(popSize);
-        for p = 2:2:popSize
-            rtes = pop(randomOrder(p-1:p),:); % 2 random routes in population
-            dists = totalDist(randomOrder(p-1:p));
+        for p = 4:4:popSize
+            rtes = pop(randomOrder(p-3:p),:); % 2 random routes in population
+            dists = totalDist(randomOrder(p-3:p));
             [ignore,idx] = min(dists); %#ok
             bestOf2Route = rtes(idx,:); % pick shortest route in the random
             routeInsertionPoints = sort(ceil(n*rand(1,2)));
             I = routeInsertionPoints(1);
             J = routeInsertionPoints(2);
-            for k = 1:2 % Mutate the Best to get Three New Routes
+            for k = 1:4 % Mutate the Best to get a new route
                 tmpPop(k,:) = bestOf2Route;
-                switch k
-                    case 2 % Inversion
-                        tmpPop(k,I:J) = tmpPop(k,J:-1:I);
-                    %case 3 % Swap
-                        %tmpPop(k,[I J]) = tmpPop(k,[J I]);
-                    %case 4 % Slide
-                        %tmpPop(k,I:J) = tmpPop(k,[I+1:J I]);
-                    otherwise % Do Nothing
+                if k == 4
+                    switch mutation
+                        case 'inversion'
+                            tmpPop(k,I:J) = tmpPop(k,J:-1:I);
+                        case 'swap'
+                            tmpPop(k,[I J]) = tmpPop(k,[J I]);
+                        case 'slide'
+                            tmpPop(k,I:J) = tmpPop(k,[I+1:J I]);
+                        otherwise % Do Nothing
+                    end
                 end
             end
-            newPop(p-1:p,:) = tmpPop;
+            newPop(p-3:p,:) = tmpPop;
         end
         pop = newPop;
         
