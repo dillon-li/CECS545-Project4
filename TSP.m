@@ -1,7 +1,14 @@
-function [ output_args ] = TSP( filename, iterations )
+function [ output_args ] = TSP( filename, mutation, popSize, iterations )
 % Wrapper function for TSP Project 4
 % Calls necessary functions to perform and output results of genetic
 % algorithm. Heavy duty work is in tsp_ga.m
+
+% Inputs:
+% filename: Random100.tsp
+% mutation: type of mutation. Options include 'swap' and 'inversion'
+% popSize: Size of the population
+% iterations: Number of iterations to run
+
 
 % Read in coordinates
 [x,y] = ReadFromSample(filename);
@@ -9,13 +16,10 @@ function [ output_args ] = TSP( filename, iterations )
 % Set up xy paramter: 100 x 2 matrix here
 xy = [x' y']; 
 
-% Population size
-popSize = size(xy,1);
-
 % Calculate distance matrix to be used for all calculations (100 x 100)
 dmat = zeros(size(xy,1));
-for i = 1:popSize
-    for j = 1:popSize
+for i = 1:size(xy,1)
+    for j = 1:size(xy,1)
         dmat(i,j) = Distance(x(i),y(i),x(j),y(j));
     end
 end
@@ -26,8 +30,8 @@ numIter = iterations;
 % showResult = true;
 
 % Create userconfig struct
-config = struct('xy',xy,'dmat',dmat,'popSize',200,'numIter',numIter,'showProg',true,'showResult',true);
-tsp_ga(config);
+config = struct('xy',xy,'dmat',dmat,'popSize',popSize,'numIter',numIter,'mutation',mutation,'showProg',true,'showResult',true);
+tsp_ga2(config);
 
 end
 
