@@ -171,6 +171,7 @@ function varargout = tsp_ga(varargin)
     distHistory = zeros(1,numIter);
     tmpPop = zeros(2,n);
     newPop = zeros(popSize,n);
+    repeat = 0;
     if showProg
         figure('Name','TSP_GA | Current Best Solution','Numbertitle','off');
         hAx = gca;
@@ -198,7 +199,19 @@ function varargout = tsp_ga(varargin)
                 plot(hAx,xy(rte,1),xy(rte,2),'r.-'); 
                 title(hAx,sprintf('Total Distance = %1.4f, Iteration = %d',minDist,iter));
                 drawnow;
+                currentIter = iter;
             end
+            repeat = 0;
+        else
+            % Counter for potential diminishing returns
+            repeat = repeat + 1;
+        end
+        
+        % Stop the program if there are diminishing returns
+        % (Stops after there are no better results after 500 iterations
+        if repeat > 500
+            numIter = currentIter;
+            break;
         end
         
         % Save a picture each 100 iterations
@@ -243,23 +256,27 @@ function varargout = tsp_ga(varargin)
     if showResult
         % Plots the GA Results
         figure('Name','TSP_GA | Results','Numbertitle','off');
-        subplot(2,2,1);
-        pclr = ~get(0,'DefaultAxesColor');
-        if dims > 2, plot3(xy(:,1),xy(:,2),xy(:,3),'.','Color',pclr);
-        else plot(xy(:,1),xy(:,2),'.','Color',pclr); end
-        title('City Locations');
-        subplot(2,2,2);
-        imagesc(dmat(optRoute,optRoute));
-        title('Distance Matrix');
-        subplot(2,2,3);
-        rte = optRoute([1:n 1]);
-        if dims > 2, plot3(xy(rte,1),xy(rte,2),xy(rte,3),'r.-');
-        else plot(xy(rte,1),xy(rte,2),'r.-'); end
-        title(sprintf('Total Distance = %1.4f',minDist));
-        subplot(2,2,4);
+        % subplot(2,2,1);
+        % pclr = ~get(0,'DefaultAxesColor');
+        % if dims > 2, plot3(xy(:,1),xy(:,2),xy(:,3),'.','Color',pclr);
+        % else plot(xy(:,1),xy(:,2),'.','Color',pclr); end
+        % title('City Locations');
+        % subplot(2,2,2);
+        % imagesc(dmat(optRoute,optRoute));
+        % title('Distance Matrix');
+        % subplot(2,2,3);
+        % rte = optRoute([1:n 1]);
+        % if dims > 2, plot3(xy(rte,1),xy(rte,2),xy(rte,3),'r.-');
+        % else plot(xy(rte,1),xy(rte,2),'r.-'); end
+        % title(sprintf('Total Distance = %1.4f',minDist));
+        % subplot(2,2,4);
         plot(distHistory,'b','LineWidth',2);
         title('Best Solution History');
         set(gca,'XLim',[0 numIter+1],'YLim',[0 1.1*max([1 distHistory])]);
+        xlabel('Number of Iterations');
+        ylabel('Total Distance');
+        name = [newDirectory '/solnHistory.png'];
+        saveas(gcf,name);
     end
     
     % Return Output
