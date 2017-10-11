@@ -1,8 +1,9 @@
 %TSP_GA Traveling Salesman Problem (TSP) Genetic Algorithm (GA)
 %   
 %   Total Disclosure: This function was written and shared on the Mathworks
-%   file exchange. I have modified it to fit my own needs for the project, but the original
-%   author, Joseph Kirk, is credited below.
+%   file exchange. I have modified it to fit my own needs for the project,
+%   but the original author is credited below, and much of the foundation
+%   for what I have done was written by him.
 %
 %   Finds a (near) optimal solution to the TSP by setting up a GA to search
 %   for the shortest route (least distance for the salesman to travel to
@@ -21,7 +22,6 @@
 %     - NUMITER (scalar integer) is the number of desired iterations for the algorithm to run
 %     - SHOWPROG (scalar logical) shows the GA progress if true
 %     - SHOWRESULT (scalar logical) shows the GA results if true
-%     - SHOWWAITBAR (scalar logical) shows a waitbar if true
 %
 % Input Notes:
 %     1. Rather than passing in a structure containing these fields, any/all of
@@ -80,10 +80,7 @@
 %     userConfig = struct('popSize',200,'numIter',1e4);
 %     resultStruct = tsp_ga(userConfig);
 %
-% Example:
-%     % Turn off the plots but show a waitbar
-%     userConfig = struct('showProg',false,'showResult',false,'showWaitbar',true);
-%     resultStruct = tsp_ga(userConfig);
+
 %
 % See also: mtsp_ga, tsp_nn, tspo_ga, tspof_ga, tspofs_ga, distmat
 %
@@ -100,7 +97,6 @@ function varargout = tsp_ga(varargin)
     defaultConfig.numIter     = 1e4;
     defaultConfig.showProg    = true;
     defaultConfig.showResult  = true;
-    defaultConfig.showWaitbar = false;
     
     % Interpret user configuration inputs
     if ~nargin
@@ -125,7 +121,6 @@ function varargout = tsp_ga(varargin)
     numIter     = configStruct.numIter;
     showProg    = configStruct.showProg;
     showResult  = configStruct.showResult;
-    showWaitbar = configStruct.showWaitbar;
     if isempty(dmat)
         nPoints = size(xy,1);
         a = meshgrid(1:nPoints);
@@ -145,7 +140,6 @@ function varargout = tsp_ga(varargin)
     numIter     = max(1,round(real(numIter(1))));
     showProg    = logical(showProg(1));
     showResult  = logical(showResult(1));
-    showWaitbar = logical(showWaitbar(1));
     
     % Initialize the Population
     pop = zeros(popSize,n);
@@ -164,9 +158,6 @@ function varargout = tsp_ga(varargin)
         figure('Name','TSP_GA | Current Best Solution','Numbertitle','off');
         hAx = gca;
     end
-    if showWaitbar
-        hWait = waitbar(0,'Searching for near-optimal solution ...');
-    end
     for iter = 1:numIter
         % Evaluate Each Population Member (Calculate Total Distance)
         for p = 1:popSize
@@ -174,7 +165,8 @@ function varargout = tsp_ga(varargin)
             for k = 2:n
                 d = d + dmat(pop(p,k-1),pop(p,k));
             end
-            totalDist(p) = d;
+            % Store all route distances for every route in population
+            totalDist(p) = d; 
         end
         
         % Find the Best Route in the Population
@@ -196,22 +188,22 @@ function varargout = tsp_ga(varargin)
         % Genetic Algorithm Operators
         randomOrder = randperm(popSize);
         for p = 4:4:popSize
-            rtes = pop(randomOrder(p-3:p),:);
+            rtes = pop(randomOrder(p-3:p),:); % 4 random routes in population
             dists = totalDist(randomOrder(p-3:p));
             [ignore,idx] = min(dists); %#ok
-            bestOf4Route = rtes(idx,:);
+            bestOf4Route = rtes(idx,:); % pick shortest route in the random
             routeInsertionPoints = sort(ceil(n*rand(1,2)));
             I = routeInsertionPoints(1);
             J = routeInsertionPoints(2);
             for k = 1:4 % Mutate the Best to get Three New Routes
                 tmpPop(k,:) = bestOf4Route;
                 switch k
-                    case 2 % Flip
+                    case 2 % Inversion
                         tmpPop(k,I:J) = tmpPop(k,J:-1:I);
-                    case 3 % Swap
-                        tmpPop(k,[I J]) = tmpPop(k,[J I]);
-                    case 4 % Slide
-                        tmpPop(k,I:J) = tmpPop(k,[I+1:J I]);
+                    %case 3 % Swap
+                        %tmpPop(k,[I J]) = tmpPop(k,[J I]);
+                    %case 4 % Slide
+                        %tmpPop(k,I:J) = tmpPop(k,[I+1:J I]);
                     otherwise % Do Nothing
                 end
             end
@@ -219,14 +211,6 @@ function varargout = tsp_ga(varargin)
         end
         pop = newPop;
         
-        % Update the waitbar
-        if showWaitbar && ~mod(iter,ceil(numIter/325))
-            waitbar(iter/numIter,hWait);
-        end
-        
-    end
-    if showWaitbar
-        close(hWait);
     end
     
     if showResult
@@ -260,7 +244,6 @@ function varargout = tsp_ga(varargin)
             'numIter',     numIter, ...
             'showProg',    showProg, ...
             'showResult',  showResult, ...
-            'showWaitbar', showWaitbar, ...
             'optRoute',    optRoute, ...
             'minDist',     minDist);
         
