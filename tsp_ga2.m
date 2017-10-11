@@ -197,20 +197,22 @@ function varargout = tsp_ga(varargin)
             rtes = pop(randomOrder(p-3:p),:); % 2 random routes in population
             dists = totalDist(randomOrder(p-3:p));
             [ignore,idx] = min(dists); %#ok
-            bestOf2Route = rtes(idx,:); % pick shortest route in the random
+            bestOf4Route = rtes(idx,:); % pick shortest route in the random
             routeInsertionPoints = sort(ceil(n*rand(1,2)));
             I = routeInsertionPoints(1);
             J = routeInsertionPoints(2);
-            for k = 1:4 % Mutate the Best to get a new route
-                tmpPop(k,:) = bestOf2Route;
+            % Mutate the best to get a new route. Replace other 3 with the
+            % same 'best' route
+            for k = 1:4 
+                tmpPop(k,:) = bestOf4Route;
                 if k == 4
                     switch mutation
                         case 'inversion'
                             tmpPop(k,I:J) = tmpPop(k,J:-1:I);
                         case 'swap'
                             tmpPop(k,[I J]) = tmpPop(k,[J I]);
-                        case 'slide'
-                            tmpPop(k,I:J) = tmpPop(k,[I+1:J I]);
+                        % case 'slide'
+                            % tmpPop(k,I:J) = tmpPop(k,[I+1:J I]);
                         otherwise % Do Nothing
                     end
                 end
