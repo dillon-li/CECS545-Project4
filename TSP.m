@@ -9,6 +9,7 @@ function [ output_args ] = TSP( filename, mutation, popSize, iterations )
 % popSize: Size of the population
 % iterations: Number of iterations to run
 
+tic; % Time
 
 % Read in coordinates
 [x,y] = ReadFromSample(filename);
@@ -32,6 +33,8 @@ numIter = iterations;
 % Create userconfig struct
 config = struct('xy',xy,'dmat',dmat,'popSize',popSize,'numIter',numIter,'mutation',mutation,'showProg',true,'showResult',true);
 tsp_ga2(config);
+
+toc;
 
 end
 
