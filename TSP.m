@@ -1,4 +1,4 @@
-function [ output_args ] = TSP( filename, mutation, popSize, iterations )
+function [ result, time ] = TSP( filename, mutation, popSize, iterations )
 % Wrapper function for TSP Project 4
 % Calls necessary functions to perform and output results of genetic
 % algorithm. Heavy duty work is in tsp_ga.m
@@ -31,10 +31,10 @@ numIter = iterations;
 % showResult = true;
 
 % Create userconfig struct
-config = struct('xy',xy,'dmat',dmat,'popSize',popSize,'numIter',numIter,'mutation',mutation,'showProg',true,'showResult',true);
-tsp_ga2(config);
+config = struct('xy',xy,'dmat',dmat,'popSize',popSize,'numIter',numIter,'mutation',mutation,'run',1,'showProg',true,'showResult',true);
+result = tsp_ga2(config);
 
-toc;
+time = toc;
 
 end
 
