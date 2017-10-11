@@ -95,6 +95,7 @@ function varargout = tsp_ga(varargin)
     defaultConfig.dmat        = [];
     defaultConfig.popSize     = 100;
     defaultConfig.numIter     = 1e4;
+    defaultConfig.run         = 0;
     defaultConfig.mutation    = 'inversion';
     defaultConfig.showProg    = true;
     defaultConfig.showResult  = true;
@@ -121,6 +122,7 @@ function varargout = tsp_ga(varargin)
     popSize     = configStruct.popSize;
     numIter     = configStruct.numIter;
     mutation    = configStruct.mutation;
+    run         = configStruct.run;
     showProg    = configStruct.showProg;
     showResult  = configStruct.showResult;
     if isempty(dmat)
@@ -146,7 +148,7 @@ function varargout = tsp_ga(varargin)
     if ~exist('Runs','dir')
         mkdir("Runs");
     end
-    newDirectory = ['Runs/' mutation '_' num2str(popSize) 'popSize_' num2str(numIter) 'iterations'];
+    newDirectory = ['Runs/' mutation '_' num2str(popSize) 'popSize_' 'Run' num2str(run)];
     if ~exist(newDirectory)
         mkdir(newDirectory);
     end
