@@ -152,7 +152,7 @@ function varargout = tsp_ga(varargin)
     globalMin = Inf;
     totalDist = zeros(1,popSize);
     distHistory = zeros(1,numIter);
-    tmpPop = zeros(4,n);
+    tmpPop = zeros(2,n);
     newPop = zeros(popSize,n);
     if showProg
         figure('Name','TSP_GA | Current Best Solution','Numbertitle','off');
@@ -187,27 +187,27 @@ function varargout = tsp_ga(varargin)
         
         % Genetic Algorithm Operators
         randomOrder = randperm(popSize);
-        for p = 4:4:popSize
-            rtes = pop(randomOrder(p-3:p),:); % 4 random routes in population
-            dists = totalDist(randomOrder(p-3:p));
+        for p = 2:2:popSize
+            rtes = pop(randomOrder(p-1:p),:); % 2 random routes in population
+            dists = totalDist(randomOrder(p-1:p));
             [ignore,idx] = min(dists); %#ok
-            bestOf4Route = rtes(idx,:); % pick shortest route in the random
+            bestOf2Route = rtes(idx,:); % pick shortest route in the random
             routeInsertionPoints = sort(ceil(n*rand(1,2)));
             I = routeInsertionPoints(1);
             J = routeInsertionPoints(2);
-            for k = 1:4 % Mutate the Best to get Three New Routes
-                tmpPop(k,:) = bestOf4Route;
+            for k = 1:2 % Mutate the Best to get Three New Routes
+                tmpPop(k,:) = bestOf2Route;
                 switch k
                     case 2 % Inversion
                         tmpPop(k,I:J) = tmpPop(k,J:-1:I);
-                    case 3 % Swap
-                        tmpPop(k,[I J]) = tmpPop(k,[J I]);
-                    case 4 % Slide
+                    %case 3 % Swap
+                        %tmpPop(k,[I J]) = tmpPop(k,[J I]);
+                    %case 4 % Slide
                         %tmpPop(k,I:J) = tmpPop(k,[I+1:J I]);
                     otherwise % Do Nothing
                 end
             end
-            newPop(p-3:p,:) = tmpPop;
+            newPop(p-1:p,:) = tmpPop;
         end
         pop = newPop;
         
