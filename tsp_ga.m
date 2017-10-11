@@ -200,9 +200,9 @@ function varargout = tsp_ga(varargin)
                 switch k
                     case 2 % Inversion
                         tmpPop(k,I:J) = tmpPop(k,J:-1:I);
-                    %case 3 % Swap
-                        %tmpPop(k,[I J]) = tmpPop(k,[J I]);
-                    %case 4 % Slide
+                    case 3 % Swap
+                        tmpPop(k,[I J]) = tmpPop(k,[J I]);
+                    case 4 % Slide
                         %tmpPop(k,I:J) = tmpPop(k,[I+1:J I]);
                     otherwise % Do Nothing
                 end
