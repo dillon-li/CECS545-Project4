@@ -141,6 +141,17 @@ function varargout = tsp_ga(varargin)
         error('Invalid mutation type chosen');
     end
     
+    folder = pwd; % Current working directory
+    [pathstr, foldername] = fileparts(folder); % foldername = 'project4'
+    if ~exist('Runs','dir')
+        mkdir("Runs");
+    end
+    newDirectory = ['Runs/' mutation '_' num2str(popSize) 'popSize_' num2str(numIter) 'iterations'];
+    if ~exist(newDirectory)
+        mkdir(newDirectory);
+    end
+    oldMin = inf; % used for saving pics
+    
     % Sanity Checks
     popSize     = 4*ceil(popSize/4);
     numIter     = max(1,round(real(numIter(1))));
@@ -184,17 +195,23 @@ function varargout = tsp_ga(varargin)
             if showProg
                 % Plot the Best Route
                 rte = optRoute([1:n 1]);
-                if dims > 2, plot3(hAx,xy(rte,1),xy(rte,2),xy(rte,3),'r.-');
-                else plot(hAx,xy(rte,1),xy(rte,2),'r.-'); end
+                plot(hAx,xy(rte,1),xy(rte,2),'r.-'); 
                 title(hAx,sprintf('Total Distance = %1.4f, Iteration = %d',minDist,iter));
                 drawnow;
             end
         end
         
+        % Save a picture each 100 iterations
+        if (mod(iter,100) == 0) && globalMin < oldMin
+            oldMin = globalMin;
+            full = [newDirectory '/' num2str(iter) '.png'];
+            saveas(gcf,full);
+        end
+        
         % Genetic Algorithm Operators
         randomOrder = randperm(popSize);
         for p = 4:4:popSize
-            rtes = pop(randomOrder(p-3:p),:); % 2 random routes in population
+            rtes = pop(randomOrder(p-3:p),:); % 4 random routes in population
             dists = totalDist(randomOrder(p-3:p));
             [ignore,idx] = min(dists); %#ok
             bestOf4Route = rtes(idx,:); % pick shortest route in the random
