@@ -26,7 +26,7 @@ numIter = iterations;
 % showResult = true;
 
 % Create userconfig struct
-config = struct('xy',xy,'dmat',dmat,'popSize',popSize,'numIter',numIter,'showProg',true,'showResult',true);
+config = struct('xy',xy,'dmat',dmat,'popSize',200,'numIter',numIter,'showProg',true,'showResult',true);
 tsp_ga(config);
 
 end
